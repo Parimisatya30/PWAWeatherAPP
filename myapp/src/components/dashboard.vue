@@ -17,7 +17,13 @@
                     label="Select a favorite city"
                   ></v-select>
                 </v-flex>
-               
+                  <v-flex xs12 md2>
+                  <v-btn
+                    class="mx-0 font-weight-light"
+                    @click="onSearchClick()"
+                    color="success"
+                  >Find Forecast</v-btn>
+                </v-flex>
               </v-layout>
             </v-container>
           </v-form>
@@ -109,10 +115,58 @@ export default {
       searchCity: ""
     };
   },
-  mounted() {
-    
+mounted() {
+    let geo1Script = document.createElement("script");
+    geo1Script.setAttribute(
+      "src",
+      "https://js.api.here.com/v3/3.0/mapsjs-core.js"
+    );
+    document.head.appendChild(geo1Script);
+    let geo2Script = document.createElement("script");
+    geo2Script.setAttribute(
+      "src",
+      "https://js.api.here.com/v3/3.0/mapsjs-service.js"
+    );
+    document.head.appendChild(geo2Script);
   },
- 
+ methods: {
+ onSearchClick() {
+      this.fetchWeatherData("hourly");
+      this.fetchWeatherData("daily");
+    },
+  
+fetchWeatherData(endPointType) {
+  
+        var url =
+          "https://cors-anywhere.herokuapp.com/https://samples.openweathermap.org/data/2.5/forecast/" +
+          endPointType +
+          "?q=" +
+          this.searchCity +
+          "&appid=b6907d289e10d714a6e88b30761fae22";
+        axios.defaults.withCredentials = false;
+        axios.defaults.headers.common["x-requested-with"] = "ashraf.com";
+        axios.get(url).then(response => {
+          if (endPointType == "hourly") this.hourlyForeCast = response.data;
+          else if (endPointType == "daily") this.dailyForeCast = response.data;
+
+        
+        });
+   
+    },
+    //formatting methods
+
+    displayTemp: function(temp) {
+      return parseFloat(temp - 273.15).toFixed(2);
+    },
+    timestampToHour: function(timestamp) {
+      var date = new Date(timestamp * 1000);
+      return date.toLocaleString("en-US");
+    },
+    timestampToDate: function(timestamp) {
+      var date = new Date(timestamp * 1000);
+      return date.toLocaleDateString("en-US").slice(0, 4);
+    }
+ }
   };
 </script>
 
