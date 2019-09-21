@@ -1,19 +1,119 @@
 <template>
-
-
+  <v-container fill-height fluid grid-list-xl>
+    <v-layout justify-left wrap>
+      <v-flex xs12 md8>
+        <material-card color="green" title="Search" text="Search for forecast data">
+          <v-form>
+            <v-container py-0>
+              <v-layout wrap>
+                <v-flex xs12 md3>
+                  <v-text-field label="City" v-model="searchCity" />
+                </v-flex>
+                <v-flex xs12 md6></v-flex>
+                <v-flex xs12 md3 justify-right>
+                  <v-select
+                    v-model="searchCity"
+                    :items="favouriteCities"
+                    label="Select a favorite city"
+                  ></v-select>
+                </v-flex>
+               
+              </v-layout>
+            </v-container>
+          </v-form>
+        </material-card>
+      </v-flex>
+      <v-flex md12>
+        <material-card
+          color="green"
+          flat
+          full-width
+          title="Daily Weather Forecast"
+          text="Shows forecast data with temp, humidity etc."
+        >
+          <v-data-table :headers="headers" :items="dailyForeCast.list" hide-actions>
+            <template slot="headerCell" slot-scope="{ header }">
+              <span class="subheading font-weight-light text--darken-3" v-text="header.text" />
+            </template>
+            <template slot="items" slot-scope="{ item }">
+              <td>{{ timestampToDate(item.dt) }}</td>
+              <td>{{ displayTemp (item.temp.day) }} c</td>
+              <td>{{ item.weather[0].main }}</td>
+              <td>{{ item.humidity }}</td>
+              <td>{{ item.pressure }}</td>
+            </template>
+          </v-data-table>
+        </material-card>
+      </v-flex>
+      <v-flex md12>
+        <material-card
+          color="green"
+          flat
+          full-width
+          title="Hourly Weather Forecast"
+          text="Shows forecast data with temp, humidity etc."
+        >
+          <v-data-table :headers="headers" :items="hourlyForeCast.list" hide-actions>
+            <template slot="headerCell" slot-scope="{ header }">
+              <span class="subheading font-weight-light text--darken-3" v-text="header.text" />
+            </template>
+            <template slot="items" slot-scope="{ item }">
+              <td>{{ timestampToHour (item.dt) }}</td>
+              <td>{{ displayTemp(item.main.temp) }} c</td>
+              <td>{{ item.weather[0].main }}</td>
+              <td>{{ item.main.humidity }}</td>
+              <td>{{ item.main.pressure }}</td>
+            </template>
+          </v-data-table>
+        </material-card>
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
-
-
-
-
 <script>
-    export default {
-        data() {
-            return { list: [] }
-        },
+import axios from "axios";
 
-        mounted() {
-            console.log("Calling");
+export default {
+  data() {
+    return {
+      headers: [
+        {
+          sortable: false,
+          text: "Date",
+          value: "date"
+        },
+        {
+          sortable: false,
+          text: "Temp",
+          value: "temp"
+        },
+        {
+          sortable: false,
+          text: "Weather",
+          value: "weather"
+        },
+        {
+          sortable: false,
+          text: "Humidity",
+          value: "humidity"
+        },
+        {
+          sortable: false,
+          text: "Pressure",
+          value: "pressure"
         }
+      ],
+      hourlyForeCast: {},
+      dailyForeCast: {},
+      favouriteCities: [],
+      searchCity: ""
     };
+  },
+  mounted() {
+    
+  },
+ 
+  };
 </script>
+
+
