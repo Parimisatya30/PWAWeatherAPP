@@ -2,7 +2,7 @@
   <v-container fill-height fluid grid-list-xl>
     <v-layout justify-left wrap>
       <v-flex xs12 md8>
-        <material-card color="green" title="Search" text="Search for forecast data">
+        <!-- <material-card color="green" title="Search" text="Search for forecast data"> -->
           <v-form>
             <v-container py-0>
               <v-layout wrap>
@@ -41,17 +41,17 @@
               </v-layout>
             </v-container>
           </v-form>
-        </material-card>
+        <!-- </material-card> -->
       </v-flex>
       <v-flex md12>
-        <material-card
+        <!-- <material-card
           color="green"
           flat
           full-width
           title="Daily Weather Forecast"
           text="Shows forecast data with temp, humidity etc."
-        >
-          <v-data-table :headers="headers" :items="dailyForeCast.list" hide-actions>
+        > -->
+          <v-data-table :headers="headers" :items="dailyForeCast.list" hide-default-footer>
             <template slot="headerCell" slot-scope="{ header }">
               <span class="subheading font-weight-light text--darken-3" v-text="header.text" />
             </template>
@@ -63,17 +63,17 @@
               <td>{{ item.pressure }}</td>
             </template>
           </v-data-table>
-        </material-card>
+        <!-- </material-card> -->
       </v-flex>
       <v-flex md12>
-        <material-card
+        <!-- <material-card
           color="green"
           flat
           full-width
           title="Hourly Weather Forecast"
           text="Shows forecast data with temp, humidity etc."
-        >
-          <v-data-table :headers="headers" :items="hourlyForeCast.list" hide-actions>
+        > -->
+          <v-data-table :headers="headers" :items="hourlyForeCast.list" hide-default-footer>
             <template slot="headerCell" slot-scope="{ header }">
               <span class="subheading font-weight-light text--darken-3" v-text="header.text" />
             </template>
@@ -85,7 +85,7 @@
               <td>{{ item.main.pressure }}</td>
             </template>
           </v-data-table>
-        </material-card>
+        <!-- </material-card> -->
       </v-flex>
     </v-layout>
   </v-container>
@@ -187,45 +187,13 @@ fetchWeatherData(endPointType) {
 
       });
     },
-  async onCurrentLocation11() {
 
-      this.gettingLocation = true;
-    //   try {
-        this.gettingLocation = false;
-        // var xyz=await this.getLocation()
-        // this.searchCity =  xyz;
-//         var myLat =xyz;
-//         axios('https://maps.googleapis.com/maps/api/geocode/json?address=' + myLat + ',' + myLon + '&key=' + myApiKey)
-//         .then((response) => response.json())
-//         .then((responseJson) => {
-//             console.log('ADDRESS GEOCODE is BACK!! => ' + JSON.stringify(responseJson));
-// })
-     
-//       } catch(e) {
-//         this.gettingLocation = false;
-       
-//       }
-      
-    },
     
   
-onCurrentLocation() {
-     
+onCurrentLocation() {     
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(position => {
-  
-//          var myApiKey =
-//     "lrA7HHg3IwOzGvbXWr4K";
-          
-//  axios('https://maps.googleapis.com/maps/api/geocode/json?address=' + position.coords.longitude + ','
-//   + position.coords.latitude + '&key=' + myApiKey)
-//         .then((response) => response.json())
-//         .then((responseJson) => {
-//             console.log('ADDRESS GEOCODE is BACK!! => ' + JSON.stringify(responseJson));
-// })
-        
-
           var platform = new H.service.Platform({
             app_id: "lrA7HHg3IwOzGvbXWr4K",
             app_code: "Qn0AIgmz2r6-QKTFnPUF4w"
