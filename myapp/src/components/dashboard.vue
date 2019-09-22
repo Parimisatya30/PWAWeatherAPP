@@ -24,6 +24,13 @@
                     color="success"
                   >Find Forecast</v-btn>
                 </v-flex>
+                  <v-flex xs12 md2>
+                  <v-btn
+                    class="mx-0 font-weight-light"
+                    color="success"
+                    @click="onCurrentLocation()"
+                  >Current City</v-btn>
+                </v-flex>
               </v-layout>
             </v-container>
           </v-form>
@@ -42,8 +49,8 @@
               <span class="subheading font-weight-light text--darken-3" v-text="header.text" />
             </template>
             <template slot="items" slot-scope="{ item }">
-              <td>{{ timestampToDate(item.dt) }}</td>
-              <td>{{ displayTemp (item.temp.day) }} c</td>
+              <td>{{ item.dt }}</td>
+              <td>{{ displayTemp (item.temp) }} c</td>
               <td>{{ item.weather[0].main }}</td>
               <td>{{ item.humidity }}</td>
               <td>{{ item.pressure }}</td>
@@ -112,7 +119,8 @@ export default {
       hourlyForeCast: {},
       dailyForeCast: {},
       favouriteCities: [],
-      searchCity: ""
+      searchCity: "",
+       gettingLocation: false,
     };
   },
 mounted() {
@@ -143,8 +151,7 @@ fetchWeatherData(endPointType) {
           "?q=" +
           this.searchCity +
           "&appid=b6907d289e10d714a6e88b30761fae22";
-        axios.defaults.withCredentials = false;
-        axios.defaults.headers.common["x-requested-with"] = "ashraf.com";
+        axios.defaults.withCredentials = false;  
         axios.get(url).then(response => {
           if (endPointType == "hourly") this.hourlyForeCast = response.data;
           else if (endPointType == "daily") this.dailyForeCast = response.data;
@@ -153,8 +160,67 @@ fetchWeatherData(endPointType) {
         });
    
     },
-    //formatting methods
+//      async  getLocation() {
+      
+//       return new Promise((resolve, reject) => {
 
+//         if(!("geolocation" in navigator)) {
+//           reject(new Error('Geolocation is not available.'));
+//         }
+
+//         navigator.geolocation.getCurrentPosition(pos => {
+//           resolve(pos);
+//         }, err => {
+//           reject(err);
+//         });
+
+//       });
+//     },
+//   async onCurrentLocation() {
+
+//       this.gettingLocation = true;
+//       try {
+//         this.gettingLocation = false;
+//         var xyz=await this.getLocation()
+//         this.searchCity =  xyz;
+     
+//       } catch(e) {
+//         this.gettingLocation = false;
+       
+//       }
+      
+//     },
+    
+  
+onCurrentLocation() {
+     
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+          var platform = new H.service.Platform({
+            app_id: "lrA7HHg3IwOzGvbXWr4K",
+            app_code: "Qn0AIgmz2r6-QKTFnPUF4w"
+          });
+          var geocoder = platform.getGeocodingService();
+          geocoder.reverseGeocode(
+            {
+              mode: "retrieveAddresses",
+              maxresults: 1,
+              prox: position.coords.latitude + "," + position.coords.longitude
+            },
+            data => {
+              this.searchCity =
+                data.Response.View[0].Result[0].Location.Address.City;
+            },
+            error => {
+              alert(error);
+            }
+          );
+        });
+      } 
+   
+    },
+      // formatting methods
     displayTemp: function(temp) {
       return parseFloat(temp - 273.15).toFixed(2);
     },
