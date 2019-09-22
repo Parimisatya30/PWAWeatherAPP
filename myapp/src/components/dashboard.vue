@@ -31,6 +31,13 @@
                     @click="onCurrentLocation()"
                   >Current City</v-btn>
                 </v-flex>
+                  <v-flex xs12 md2>
+                  <v-btn
+                    class="mx-0 font-weight-light"
+                    color="success"
+                      @click="onSaveClick()"
+                  >Save Search</v-btn>
+                </v-flex>
               </v-layout>
             </v-container>
           </v-form>
@@ -85,6 +92,7 @@
 </template>
 <script>
 import axios from "axios";
+import firebase from "../../configFirebase.js";
 
 export default {
   data() {
@@ -123,6 +131,9 @@ export default {
        gettingLocation: false,
     };
   },
+ created: function() {
+    this.fetchFavouriteCities();
+  },
 mounted() {
     let geo1Script = document.createElement("script");
     geo1Script.setAttribute(
@@ -160,36 +171,42 @@ fetchWeatherData(endPointType) {
         });
    
     },
-//      async  getLocation() {
+     async  getLocation() {
       
-//       return new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
 
-//         if(!("geolocation" in navigator)) {
-//           reject(new Error('Geolocation is not available.'));
-//         }
+        if(!("geolocation" in navigator)) {
+          reject(new Error('Geolocation is not available.'));
+        }
 
-//         navigator.geolocation.getCurrentPosition(pos => {
-//           resolve(pos);
-//         }, err => {
-//           reject(err);
-//         });
+        navigator.geolocation.getCurrentPosition(pos => {
+          resolve(pos);
+        }, err => {
+          reject(err);
+        });
 
-//       });
-//     },
-//   async onCurrentLocation() {
+      });
+    },
+  async onCurrentLocation11() {
 
-//       this.gettingLocation = true;
-//       try {
-//         this.gettingLocation = false;
-//         var xyz=await this.getLocation()
-//         this.searchCity =  xyz;
+      this.gettingLocation = true;
+    //   try {
+        this.gettingLocation = false;
+        // var xyz=await this.getLocation()
+        // this.searchCity =  xyz;
+//         var myLat =xyz;
+//         axios('https://maps.googleapis.com/maps/api/geocode/json?address=' + myLat + ',' + myLon + '&key=' + myApiKey)
+//         .then((response) => response.json())
+//         .then((responseJson) => {
+//             console.log('ADDRESS GEOCODE is BACK!! => ' + JSON.stringify(responseJson));
+// })
      
 //       } catch(e) {
 //         this.gettingLocation = false;
        
 //       }
       
-//     },
+    },
     
   
 onCurrentLocation() {
@@ -197,6 +214,18 @@ onCurrentLocation() {
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(position => {
+  
+//          var myApiKey =
+//     "lrA7HHg3IwOzGvbXWr4K";
+          
+//  axios('https://maps.googleapis.com/maps/api/geocode/json?address=' + position.coords.longitude + ','
+//   + position.coords.latitude + '&key=' + myApiKey)
+//         .then((response) => response.json())
+//         .then((responseJson) => {
+//             console.log('ADDRESS GEOCODE is BACK!! => ' + JSON.stringify(responseJson));
+// })
+        
+
           var platform = new H.service.Platform({
             app_id: "lrA7HHg3IwOzGvbXWr4K",
             app_code: "Qn0AIgmz2r6-QKTFnPUF4w"
@@ -217,9 +246,28 @@ onCurrentLocation() {
             }
           );
         });
+      
       } 
    
     },
+  
+   onSaveClick() {
+      firebase.db.collection("fav-cities").add({
+        CityName: this.searchCity
+      });
+    },
+     fetchFavouriteCities() {
+      firebase.db
+        .collection("fav-cities")
+        .orderBy("CityName", "desc")
+        .onSnapshot(snapShot => {
+          this.favouriteCities = [];
+          snapShot.forEach(city => {
+            this.favouriteCities.push(city.data().CityName);
+          });
+        });
+    },
+
       // formatting methods
     displayTemp: function(temp) {
       return parseFloat(temp - 273.15).toFixed(2);
