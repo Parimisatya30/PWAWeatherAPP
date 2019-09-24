@@ -9,9 +9,10 @@
         </v-app-bar>
         <v-content>
             <dashboard />
-        </v-content>
+        </v-content>    
     </v-app>
 </template>
+
 <script>
     import dashboard from './components/dashboard';
 

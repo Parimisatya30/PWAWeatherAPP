@@ -2,7 +2,11 @@
   <v-container fill-height fluid grid-list-xl>
     <v-layout justify-left wrap>
       <v-flex xs12 md8>
-        <!-- <material-card color="green" title="Search" text="Search for forecast data"> -->
+        
+           <v-card-title color="green"> 
+    Search for forecast data
+    <v-spacer></v-spacer>     
+  </v-card-title>
           <v-form>
             <v-container py-0>
               <v-layout wrap>
@@ -41,58 +45,38 @@
               </v-layout>
             </v-container>
           </v-form>
-        <!-- </material-card> -->
+   
       </v-flex>
       <v-flex md12>
-        <!-- <material-card
-          color="green"
-          flat
-          full-width
-          title="Daily Weather Forecast"
-          text="Shows forecast data with temp, humidity etc."
-        > -->
-          <v-data-table :headers="headers" :items="dailyForeCast.list" hide-default-footer>
+           <v-card-title color="green"> 
+    Daily Weather Forecast
+    <v-spacer></v-spacer>     
+  </v-card-title>       
+          <v-data-table :headers="headers" :items="dailyForeCast" hide-default-footer>
             <template slot="headerCell" slot-scope="{ header }">
               <span class="subheading font-weight-light text--darken-3" v-text="header.text" />
-            </template>
-            <template slot="items" slot-scope="{ item }">
-              <td>{{ item.dt }}</td>
-              <td>{{ displayTemp (item.temp) }} c</td>
-              <td>{{ item.weather[0].main }}</td>
-              <td>{{ item.humidity }}</td>
-              <td>{{ item.pressure }}</td>
-            </template>
-          </v-data-table>
-        <!-- </material-card> -->
+            </template>         
+          </v-data-table>     
       </v-flex>
       <v-flex md12>
-        <!-- <material-card
-          color="green"
-          flat
-          full-width
-          title="Hourly Weather Forecast"
-          text="Shows forecast data with temp, humidity etc."
-        > -->
-          <v-data-table :headers="headers" :items="hourlyForeCast.list" hide-default-footer>
+              <v-card-title color="green"> 
+    Hourly Weather Forecast
+    <v-spacer></v-spacer>     
+  </v-card-title>       
+          <v-data-table :headers="headersHourly" :items="hourlyForeCast" hide-default-footer >
             <template slot="headerCell" slot-scope="{ header }">
               <span class="subheading font-weight-light text--darken-3" v-text="header.text" />
-            </template>
-            <template slot="items" slot-scope="{ item }">
-              <td>{{ timestampToHour (item.dt) }}</td>
-              <td>{{ displayTemp(item.main.temp) }} c</td>
-              <td>{{ item.weather[0].main }}</td>
-              <td>{{ item.main.humidity }}</td>
-              <td>{{ item.main.pressure }}</td>
-            </template>
-          </v-data-table>
-        <!-- </material-card> -->
+            </template>         
+          </v-data-table>         
       </v-flex>
     </v-layout>
   </v-container>
 </template>
 <script>
+ 
 import axios from "axios";
 import firebase from "../../configFirebase.js";
+ 
 
 export default {
   data() {
@@ -124,13 +108,42 @@ export default {
           value: "pressure"
         }
       ],
-      hourlyForeCast: {},
-      dailyForeCast: {},
+      headersHourly: [
+     
+        {
+          sortable: false,
+          text: "hourlytime",
+          value: "hourlytime"
+        },
+        {
+          sortable: false,
+          text: "Temp",
+          value: "temp"
+        },
+        {
+          sortable: false,
+          text: "Weather",
+          value: "weather"
+        },
+        {
+          sortable: false,
+          text: "Humidity",
+          value: "humidity"
+        },
+        {
+          sortable: false,
+          text: "Pressure",
+          value: "pressure"
+        }
+      ],
+      hourlyForeCast: [],
+      dailyForeCast: [],
       favouriteCities: [],
       searchCity: "",
        gettingLocation: false,
     };
   },
+ 
  created: function() {
     this.fetchFavouriteCities();
   },
@@ -164,36 +177,47 @@ fetchWeatherData(endPointType) {
           "&appid=b6907d289e10d714a6e88b30761fae22";
         axios.defaults.withCredentials = false;  
         axios.get(url).then(response => {
-          if (endPointType == "hourly") this.hourlyForeCast = response.data;
-          else if (endPointType == "daily") this.dailyForeCast = response.data;
-
+          if (endPointType == "hourly") 
+          {
+            this.hourlyForeCast=[];
         
+          response.data.list.forEach(x => {
+                            var model = {
+                               hourlytime: new Date(x.dt * 1000).toLocaleString("en-US"),                                              
+                                temp: parseFloat(x.main.temp - 273.15).toFixed(2) + ' c', 
+                                weather: x.weather[0].main,
+                                humidity: x.main.humidity,
+                                pressure: x.main.pressure
+                            }
+                            this.hourlyForeCast.push(model);
+                             
+                        });                     
+          }
+          else if (endPointType == "daily") 
+          {            
+this.dailyForeCast=[];
+             response.data.list.forEach(x => {
+                            var model = {
+                                date: new Date(x.dt * 1000).toLocaleDateString("en-US").slice(0, 9),
+                                temp: parseFloat(x.temp.day - 273.15).toFixed(2) + ' c',
+                                weather: x.weather[0].main,
+                                humidity: x.humidity,
+                                pressure: x.pressure
+                            }
+                            this.dailyForeCast.push(model);
+                        });
+
+          }        
         });
    
-    },
-     async  getLocation() {
-      
-      return new Promise((resolve, reject) => {
-
-        if(!("geolocation" in navigator)) {
-          reject(new Error('Geolocation is not available.'));
-        }
-
-        navigator.geolocation.getCurrentPosition(pos => {
-          resolve(pos);
-        }, err => {
-          reject(err);
-        });
-
-      });
-    },
-
-    
+    },    
   
 onCurrentLocation() {     
 
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(position => {
+        navigator.geolocation.getCurrentPosition(position => {  
+
+
           var platform = new H.service.Platform({
             app_id: "lrA7HHg3IwOzGvbXWr4K",
             app_code: "Qn0AIgmz2r6-QKTFnPUF4w"
@@ -236,18 +260,7 @@ onCurrentLocation() {
         });
     },
 
-      // formatting methods
-    displayTemp: function(temp) {
-      return parseFloat(temp - 273.15).toFixed(2);
-    },
-    timestampToHour: function(timestamp) {
-      var date = new Date(timestamp * 1000);
-      return date.toLocaleString("en-US");
-    },
-    timestampToDate: function(timestamp) {
-      var date = new Date(timestamp * 1000);
-      return date.toLocaleDateString("en-US").slice(0, 4);
-    }
+    
  }
   };
 </script>
